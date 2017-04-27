@@ -64,8 +64,7 @@ function handleError(res, statusCode) {
   };
 }
 
-// Gets a list of Customers //
-// Crear un endpoint que regrese el listado de usuarios.
+// Gets a list of Customers
 export function index(req, res) {
   return Customer.find().exec()
     .then(respondWithResult(res))
@@ -73,8 +72,6 @@ export function index(req, res) {
 }
 
 // Gets a single Customer from the DB
-//Crear un endpoint que se le envié un id y 
-//regrese el usuario encontrado en la lista anterior.
 export function show(req, res) {
   return Customer.findById(req.params.id).exec()
     .then(handleEntityNotFound(res))
@@ -82,9 +79,40 @@ export function show(req, res) {
     .catch(handleError(res));
 }
 
-// Crear un endpoint que agregué un usuario a la lista anterior.
+// Creates a new Customer in the DB
 export function create(req, res) {
   return Customer.create(req.body)
     .then(respondWithResult(res, 201))
+    .catch(handleError(res));
+}
+
+// Upserts the given Customer in the DB at the specified ID
+export function upsert(req, res) {
+  if(req.body._id) {
+    Reflect.deleteProperty(req.body, '_id');
+  }
+  return Customer.findOneAndUpdate({_id: req.params.id}, req.body, {new: true, upsert: true, setDefaultsOnInsert: true, runValidators: true}).exec()
+
+    .then(respondWithResult(res))
+    .catch(handleError(res));
+}
+
+// Updates an existing Customer in the DB
+export function patch(req, res) {
+  if(req.body._id) {
+    Reflect.deleteProperty(req.body, '_id');
+  }
+  return Customer.findById(req.params.id).exec()
+    .then(handleEntityNotFound(res))
+    .then(patchUpdates(req.body))
+    .then(respondWithResult(res))
+    .catch(handleError(res));
+}
+
+// Deletes a Customer from the DB
+export function destroy(req, res) {
+  return Customer.findById(req.params.id).exec()
+    .then(handleEntityNotFound(res))
+    .then(removeEntity(res))
     .catch(handleError(res));
 }
