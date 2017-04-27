@@ -64,12 +64,17 @@ function handleError(res, statusCode) {
   };
 }
 
-// Gets a list of Customers
+// Gets a list of Customers //
+// Crear un endpoint que regrese el listado de usuarios.
 export function index(req, res) {
-  return res.json([{name:'Juan Alban'},{name:'Carlos Luna'}]);
+  return Customer.find().exec()
+    .then(respondWithResult(res))
+    .catch(handleError(res));
 }
 
 // Gets a single Customer from the DB
+//Crear un endpoint que se le envié un id y 
+//regrese el usuario encontrado en la lista anterior.
 export function show(req, res) {
   return Customer.findById(req.params.id).exec()
     .then(handleEntityNotFound(res))
@@ -77,7 +82,9 @@ export function show(req, res) {
     .catch(handleError(res));
 }
 
-// Add 
-export function add(req, res) {
-  return res.json({test:req.body});
+// Crear un endpoint que agregué un usuario a la lista anterior.
+export function create(req, res) {
+  return Customer.create(req.body)
+    .then(respondWithResult(res, 201))
+    .catch(handleError(res));
 }
